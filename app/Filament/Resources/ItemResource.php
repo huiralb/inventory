@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ItemResource\Pages;
-use App\Filament\Resources\ItemResource\RelationManagers;
-use App\Models\Item;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\Item;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ItemResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ItemResource\RelationManagers;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class ItemResource extends Resource
 {
@@ -28,6 +30,7 @@ class ItemResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Select::make('categories')
                     ->label('Kategori')
+                    ->required()
                     ->multiple()
                     ->relationship('categories', 'name')
                     ->createOptionForm([
@@ -39,17 +42,12 @@ class ItemResource extends Resource
                             ->relationship('parent', 'name'),
                     ]),
 
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('quantity')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('price')
-                    ->numeric()
-                    ->default(0.00)
-                    ->prefix('$'),
-                Forms\Components\TextInput::make('meta'),
+                SpatieMediaLibraryFileUpload::make('images')
+                    ->multiple()
+                    ->responsiveImages()
+                    ->conversion('thumb'),
+
+                Forms\Components\Textarea::make('description'),
                 Forms\Components\Select::make('location_id')
                     ->relationship('location', 'name')
                     ->createOptionForm([
@@ -61,7 +59,17 @@ class ItemResource extends Resource
                             ->label('Lokasi Induk')
                             ->nullable()
                             ->relationship('parent', 'name'),
-                    ])
+                    ]),
+
+                Forms\Components\TextInput::make('meta'),
+                Forms\Components\TextInput::make('quantity')
+                    ->numeric()
+                    ->default(1),
+                Forms\Components\TextInput::make('price')
+                    ->numeric()
+                    ->default(0.00)
+                    ->prefix('$'),
+
             ]);
     }
 
@@ -69,6 +77,7 @@ class ItemResource extends Resource
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('images')->label(''),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('category.name')
