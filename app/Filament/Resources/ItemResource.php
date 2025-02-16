@@ -41,7 +41,6 @@ class ItemResource extends Resource
                             ->nullable()
                             ->relationship('parent', 'name'),
                     ]),
-
                 SpatieMediaLibraryFileUpload::make('images')
                     ->multiple()
                     ->responsiveImages()
@@ -61,6 +60,13 @@ class ItemResource extends Resource
                             ->relationship('parent', 'name'),
                     ]),
 
+                Forms\Components\Select::make('tags')
+                    ->multiple()
+                    ->relationship('tags', 'name')
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                    ]),
                 Forms\Components\TextInput::make('meta'),
                 Forms\Components\TextInput::make('quantity')
                     ->numeric()
@@ -80,7 +86,8 @@ class ItemResource extends Resource
                 SpatieMediaLibraryImageColumn::make('images')->label(''),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('category.name')
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('quantity')
                     ->numeric()
